@@ -23,7 +23,7 @@ for iter = 1:num_iters
     for row=1:m,
         temp += ( theta' * X(row,:)' - y(row,:) ) * X(row,:)';
     end;
-    temp = temp * alpha / m
+    temp = temp * alpha / m;
     theta = theta - temp;
 
 
