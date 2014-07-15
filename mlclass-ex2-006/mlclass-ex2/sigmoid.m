@@ -15,7 +15,6 @@ col = size(z, 2);
 for i=1:row,
 	for j=1:col,
 		g(i, j) = 1 / ( 1+e ^ ( -z(i, j) ) );
-		g(i, j)
 	end;
 end;
 
