@@ -62,17 +62,6 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
-%X = [ones(m,1), X];
-%
-%for i=1:m
-%	for k=1:num_labels
-%		J += -(y(i)==num_labels) * log(  sigmoid( [ones(1,1), sigmoid(X(i,:) * Theta1')] * Theta2' ) ) ...
-%			- (1-(y(i)==num_labels)) * log( 1 - sigmoid( [ones(1,1), sigmoid(X(i,:) * Theta1')] * Theta2') );
-%	end;
-%end;
-%
-%J = sum(J)/m;
-
 z2 = [ones(m,1), X] * Theta1'; % [5000,401] * [401,25] = [5000,25]
 a2 = sigmoid(z2); % [5000,25]
 z3 = [ones(m,1), a2] * Theta2'; % [5000,26] * [26,10] = [5000,10]
@@ -93,19 +82,31 @@ J += (lambda / (2 * m)) * (sum(sum(Theta1(:,2:end) .^ 2)) + sum(sum(Theta2(:,2:e
 % =========================================================================
 
 for t=1:m
+	% step 1
 	a_1 = X(t,:);
 	a_1 = [1, a_1]; %[1,401]
 	z_2 = a_1 * Theta1'; %[1,401] * [401,25] = [1,25]
 	a_2 = sigmoid(z_2); %[1,25]
 	z_3 = [1, a_2] * Theta2'; %[1,26] * [26,10] = [1,10]
 	a_3 = sigmoid(z_3); %[1,10]
-	delta_3 = a_3 .- ymat(t); %[1,10]
+
+	%step 2
+	delta_3 = a_3 - ymat(t,:); %[1,10]
+
+	%step 3
 	delta_2 = (Theta2' * delta_3'.* sigmoidGradient( [1, z_2]') )'; % ([26,10] * [10,1] .* [26,1])' = [1,26]
 
-	Theta2_grad = Theta2 .+ (delta_3' * [1,a_2])/m;
-	Theta1_grad = Theta1 .+ (delta_2(:,2:end)' * a_1 )/m;
+	%step 4
+	Theta2_grad += (delta_3' * [1,a_2]); %[10,26]
+	Theta1_grad += (delta_2(:,2:end)' * a_1 ); %[25,401]
 
 end;
+
+Theta1_grad = Theta1_grad / m;
+Theta2_grad = Theta2_grad / m;
+
+Theta1_grad(:,2:end) += Theta1(:,2:end) * (lambda / m);
+Theta2_grad(:,2:end) += Theta2(:,2:end) * (lambda / m);
 
 
 % Unroll gradients
