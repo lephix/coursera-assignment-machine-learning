@@ -23,11 +23,24 @@ sigma = 0.3;
 %        mean(double(predictions ~= yval))
 %
 
+list = [0.01; 0.03; 0.1; 0.3; 1; 3; 10; 30];
 
-
-
-
-
+best = 10000000;
+for i=1:size(list)
+	for j=1:size(list)
+		model = svmTrain(X, y, list(i), @(x1, x2) gaussianKernel(x1, x2, list(j)));
+		predictions = svmPredict(model, Xval);
+		result = mean(double(predictions ~= yval));
+		if result < best
+			best = result;
+			C = list(i);
+			sigma = list(j);
+		end;
+	end;
+end;
+best
+C
+sigma
 
 % =========================================================================
 
